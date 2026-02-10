@@ -413,9 +413,7 @@ function drawTimelineOverlay(
   });
 
   // --- 4. Dots with gooey metaball effect ---
-  // Cap dots so minimum spacing is ~14px (scaled) between centers
-  const maxDotsFromSpacing = Math.floor((620 * S) / (14 * S));
-  const totalDots = Math.max(20, Math.min(maxDotsFromSpacing, Math.round(duration * 1.15)));
+  const totalDots = Math.max(15, Math.min(30, Math.round(duration * 0.6)));
   const dotY = pillY + activePH / 2 + Math.round(22 * S);
   const dotR = Math.round(3 * S);
   const playheadR = Math.round(7 * S);

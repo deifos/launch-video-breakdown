@@ -38,11 +38,7 @@ export function TimelineDots({
   const dotsPaddingRef = useRef(0);
 
   const totalDots = useMemo(
-    () => {
-      // Target ~10px spacing between dot centers at 620px container width
-      const maxFromSpacing = Math.floor(620 / 14);
-      return Math.max(20, Math.min(maxFromSpacing, Math.round(duration * 1.15)));
-    },
+    () => Math.max(15, Math.min(30, Math.round(duration * 0.6))),
     [duration]
   );
 

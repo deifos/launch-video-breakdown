@@ -8,30 +8,29 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!);
 
-const ANALYSIS_PROMPT = `Analyze this launch video (max 90 seconds) and identify the timestamps for the following sections:
+const ANALYSIS_PROMPT = `Analyze this launch video and identify its natural sections from the following possible types:
 
-1. **Intro** - Opening hook, problem statement, or attention grabber
-2. **Features** - Product features or key capabilities overview
-3. **Best Feature** - Highlight of the most compelling feature or demo
-4. **Outcome** - Benefits, results, or transformation shown
-5. **Outro** - Call-to-action, closing statement, or branding
+- **Intro** - Opening hook, problem statement, or attention grabber
+- **Features** - Product features or key capabilities overview
+- **Best Feature** - Highlight of the most compelling feature or demo
+- **Outcome** - Benefits, results, or transformation shown
+- **Outro** - Call-to-action, closing statement, or branding
 
 Guidelines:
+- Only include sections that genuinely exist in the video. Do NOT force sections that aren't there — 3 or 4 sections is perfectly fine
 - Provide timestamps in seconds (e.g., 0, 12.5, 45.2)
-- Use these section names as priority, but suggest alternative names if the video structure differs significantly
 - Each section should have a clear start and end time
-- Sections should be in chronological order and not overlap
-- If a section doesn't exist in the video, you can skip it
-- Return at least 2 sections, preferably all 5
+- Sections must be contiguous (no gaps), in chronological order, and not overlap
+- The first section must start at 0 and the last section must end at the video's total duration
+- Keep section names short (1-2 words)
 
-IMPORTANT: Return ONLY valid JSON in this exact format, no markdown, no code blocks:
+IMPORTANT: Return ONLY valid JSON, no markdown, no code blocks:
 {
   "sections": [
     {"name": "Intro", "startTime": 0, "endTime": 10},
-    {"name": "Features", "startTime": 10, "endTime": 35},
-    {"name": "Best Feature", "startTime": 35, "endTime": 55},
-    {"name": "Outcome", "startTime": 55, "endTime": 75},
-    {"name": "Outro", "startTime": 75, "endTime": 90}
+    {"name": "Features", "startTime": 10, "endTime": 45},
+    {"name": "Best Feature", "startTime": 45, "endTime": 70},
+    {"name": "Outro", "startTime": 70, "endTime": 90}
   ]
 }`;
 
@@ -171,21 +170,12 @@ export async function POST(request: NextRequest) {
     } catch (parseError) {
       console.error("Failed to parse Gemini response:", parseError);
 
-      // Fallback: Try to create default sections
+      // Fallback: create default sections
       sections = [
-        { name: "Intro", startTime: 0, endTime: duration * 0.2 },
-        {
-          name: "Features",
-          startTime: duration * 0.2,
-          endTime: duration * 0.5,
-        },
-        {
-          name: "Best Feature",
-          startTime: duration * 0.5,
-          endTime: duration * 0.7,
-        },
-        { name: "Outcome", startTime: duration * 0.7, endTime: duration * 0.9 },
-        { name: "Outro", startTime: duration * 0.9, endTime: duration },
+        { name: "Intro", startTime: 0, endTime: duration * 0.15 },
+        { name: "Features", startTime: duration * 0.15, endTime: duration * 0.55 },
+        { name: "Best Feature", startTime: duration * 0.55, endTime: duration * 0.8 },
+        { name: "Outro", startTime: duration * 0.8, endTime: duration },
       ];
     }
 
